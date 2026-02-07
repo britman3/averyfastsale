@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev -p 3098",
     "build": "next build",
-    "start": "next start -p 3098"
+    "start": "next start -p 3098",
+    "lint": "eslint"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -26,15 +27,16 @@
     "zod": "latest"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "latest",
     "@types/jsonwebtoken": "latest",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "autoprefixer": "^10",
-    "postcss": "^8",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
     "prisma": "^5.22.0",
-    "tailwindcss": "^3",
+    "tailwindcss": "^4",
     "tsx": "latest",
     "typescript": "^5"
   }
