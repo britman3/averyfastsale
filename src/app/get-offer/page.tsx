@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import TrustBar from "@/components/sections/TrustBar";
 import LeadForm from "@/components/sections/LeadForm";
@@ -14,7 +15,9 @@ export default function GetOfferPage() {
       <TrustBar />
       <section className="py-12 md:py-20">
         <div className="mx-auto max-w-xl px-4 md:px-8">
-          <LeadForm />
+          <Suspense fallback={<div className="h-96 animate-pulse rounded-xl bg-light-grey" />}>
+            <LeadForm />
+          </Suspense>
         </div>
       </section>
     </>

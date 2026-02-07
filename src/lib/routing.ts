@@ -84,7 +84,7 @@ async function pickRoundRobin(
   triedRules: TriedRule[],
 ): Promise<Student | null> {
   // Group by priority
-  const minPriority = activeTargets[0].priority
+  const minPriority = activeTargets[0]!.priority
   const tiedTargets = activeTargets.filter(t => t.priority === minPriority)
 
   // Filter to eligible students
@@ -120,7 +120,7 @@ async function pickRoundRobin(
   }
 
   triedRules.push({ rule, targets: rule.targets })
-  return eligible[nextIndex].student
+  return eligible[nextIndex]!.student
 }
 
 /**

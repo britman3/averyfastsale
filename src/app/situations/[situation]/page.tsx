@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import HeroBanner from "@/components/sections/HeroBanner";
@@ -162,7 +163,9 @@ export default async function SituationPage({
             </div>
 
             <div className="lg:col-span-2">
-              <LeadForm />
+              <Suspense fallback={<div className="h-96 animate-pulse rounded-xl bg-light-grey" />}>
+                <LeadForm />
+              </Suspense>
             </div>
           </div>
         </div>
