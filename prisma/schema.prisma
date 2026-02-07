@@ -1,0 +1,133 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Settings {
+  id                 Int      @id @default(autoincrement())
+  adminPasswordHash  String
+  notifyAdminEmail   String
+  resendApiKey       String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model ReservedSubdomain {
+  id        Int      @id @default(autoincrement())
+  slug      String   @unique
+  reason    String?
+  createdAt DateTime @default(now())
+}
+
+model Student {
+  id            Int       @id @default(autoincrement())
+  slug          String    @unique
+  displayName   String
+  phone         String
+  email         String
+  bio           String?
+  headshotUrl   String?
+  isActive      Boolean   @default(true)
+  isAtCapacity  Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  routingRuleStudents RoutingRuleStudent[]
+  leads               Lead[]
+}
+
+model RoutingRule {
+  id        Int      @id @default(autoincrement())
+  type      String   // POSTCODE_PREFIX, POSTCODE_AREA, REGION, CATCH_ALL
+  value     String   // e.g. "B1", "B", "West Midlands", "*"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  students RoutingRuleStudent[]
+
+  @@unique([type, value])
+}
+
+model RoutingRuleStudent {
+  id            Int      @id @default(autoincrement())
+  routingRuleId Int
+  studentId     Int
+  priority      Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  routingRule RoutingRule @relation(fields: [routingRuleId], references: [id], onDelete: Cascade)
+  student     Student     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([routingRuleId, studentId])
+}
+
+model Lead {
+  id              Int      @id @default(autoincrement())
+  studentId       Int?
+  name            String
+  email           String
+  phone           String
+  postcode        String
+  propertyType    String?
+  timeframe       String?
+  message         String?
+  source          String?  // e.g. "student-site", "main-site"
+  status          String   @default("new") // new, contacted, converted, lost
+  notifiedAt      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  student Student? @relation(fields: [studentId], references: [id], onDelete: SetNull)
+}
+
+model CmsPage {
+  id        Int      @id @default(autoincrement())
+  slug      String   @unique
+  title     String
+  sections  Json     @default("[]")
+  isPublished Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Phase 2 expansion tables
+
+model AnalyticsEvent {
+  id        Int      @id @default(autoincrement())
+  sessionId String
+  event     String
+  page      String?
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  analyticsSession AnalyticsSession? @relation(fields: [sessionId], references: [sessionId])
+}
+
+model AnalyticsSession {
+  id         Int      @id @default(autoincrement())
+  sessionId  String   @unique
+  source     String?
+  medium     String?
+  campaign   String?
+  referrer   String?
+  userAgent  String?
+  ip         String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  events AnalyticsEvent[]
+}
+
+model FormStep {
+  id         Int      @id @default(autoincrement())
+  sessionId  String
+  step       Int
+  fieldName  String
+  fieldValue String?
+  completedAt DateTime?
+  createdAt  DateTime @default(now())
+}
