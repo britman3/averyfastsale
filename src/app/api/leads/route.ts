@@ -69,10 +69,27 @@ export async function POST(request: NextRequest) {
     // Normalise postcode
     const normalisedPostcode = normalisePostcode(data.postcode)
 
+    // Determine capture mode and routing
+    const requestedCaptureMode = body.captureMode || 'CENTRAL'
+    let captureMode: 'CENTRAL' | 'STUDENT_DIRECT' = 'CENTRAL'
+    let directStudentId: string | null = null
+    let sourceSubdomainSlug: string | null = body.sourceSubdomainSlug || null
+
+    if (requestedCaptureMode === 'STUDENT_DIRECT' && body.studentId) {
+      // Verify student exists and is active
+      const directStudent = await prisma.student.findUnique({
+        where: { id: body.studentId, isActive: true },
+      })
+      if (directStudent) {
+        captureMode = 'STUDENT_DIRECT'
+        directStudentId = directStudent.id
+      }
+    }
+
     // Create Lead record
     const lead = await prisma.lead.create({
       data: {
-        captureMode: 'CENTRAL',
+        captureMode,
         status: 'NEW',
         fullName: data.fullName,
         phone: data.phone,
@@ -93,7 +110,8 @@ export async function POST(request: NextRequest) {
         utmTerm: data.utmTerm || null,
         utmContent: data.utmContent || null,
         referrerUrl: data.referrerUrl || null,
-        assignedStudentId: null,
+        sourceSubdomainSlug,
+        assignedStudentId: directStudentId,
       },
     })
 
@@ -104,23 +122,32 @@ export async function POST(request: NextRequest) {
         type: 'FORM_SUBMITTED',
         payload: {
           sourcePage: data.referrerUrl || 'direct',
-          captureMode: 'CENTRAL',
+          captureMode,
+          ...(sourceSubdomainSlug ? { sourceSubdomainSlug } : {}),
         },
       },
     })
 
-    // Route the lead
-    const assignedStudentId = await routeLeadFull(lead.postcode, lead.townCity)
+    // Route the lead (skip routing engine for STUDENT_DIRECT — already assigned)
+    let assignedStudentId: string | null = directStudentId
+
+    if (!assignedStudentId) {
+      // Central mode — use routing engine
+      assignedStudentId = await routeLeadFull(lead.postcode, lead.townCity)
+    }
 
     // Fetch assigned student details (needed for emails)
     let assignedStudent: { id: string; email: string; displayName: string } | null = null
 
-    if (assignedStudentId) {
+    if (assignedStudentId && !directStudentId) {
+      // Only update if routed (not already set at creation)
       await prisma.lead.update({
         where: { id: lead.id },
         data: { assignedStudentId },
       })
+    }
 
+    if (assignedStudentId) {
       assignedStudent = await prisma.student.findUnique({
         where: { id: assignedStudentId },
         select: { id: true, email: true, displayName: true },
@@ -130,7 +157,10 @@ export async function POST(request: NextRequest) {
         data: {
           leadId: lead.id,
           type: 'ASSIGNED',
-          payload: { studentId: assignedStudentId, method: 'AUTO_ROUTE' },
+          payload: {
+            studentId: assignedStudentId,
+            method: captureMode === 'STUDENT_DIRECT' ? 'STUDENT_DIRECT' : 'AUTO_ROUTE',
+          },
         },
       })
     } else {

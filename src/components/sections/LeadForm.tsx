@@ -35,6 +35,7 @@ export default function LeadForm({
   captureMode = 'CENTRAL',
   studentId,
   studentName,
+  sourceSubdomainSlug,
   compact = false,
 }: LeadFormProps) {
   const router = useRouter()
@@ -126,13 +127,15 @@ export default function LeadForm({
     e.preventDefault()
     if (!validateCompact()) return
 
-    // Redirect to /get-offer with pre-filled params
+    // Redirect to full form with pre-filled params
     const params = new URLSearchParams({
       fullName: fullName.trim(),
       phone: phone.replace(/\s/g, ''),
       postcode: postcode.trim(),
     })
-    router.push(`/get-offer?${params.toString()}`)
+    // On student subdomain, redirect to /contact; on main site, redirect to /get-offer
+    const target = captureMode === 'STUDENT_DIRECT' ? '/contact' : '/get-offer'
+    router.push(`${target}?${params.toString()}`)
   }
 
   async function handleFullSubmit(e: FormEvent) {
@@ -143,7 +146,7 @@ export default function LeadForm({
     setServerError('')
 
     try {
-      const payload = {
+      const payload: Record<string, unknown> = {
         fullName: fullName.trim(),
         phone: phone.replace(/\s/g, ''),
         email: email.trim() || '',
@@ -158,6 +161,13 @@ export default function LeadForm({
         honeypot,
         ...utmParams,
         referrerUrl,
+      }
+
+      // Mode B: student direct capture
+      if (captureMode === 'STUDENT_DIRECT' && studentId) {
+        payload.captureMode = 'STUDENT_DIRECT'
+        payload.studentId = studentId
+        payload.sourceSubdomainSlug = sourceSubdomainSlug || ''
       }
 
       const res = await fetch('/api/leads', {

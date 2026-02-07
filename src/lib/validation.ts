@@ -28,6 +28,10 @@ export const leadFormSchema = z.object({
   utmTerm: z.string().optional(),
   utmContent: z.string().optional(),
   referrerUrl: z.string().optional(),
+  // Mode B fields (student direct capture)
+  captureMode: z.enum(['CENTRAL', 'STUDENT_DIRECT']).optional(),
+  studentId: z.string().optional(),
+  sourceSubdomainSlug: z.string().optional(),
 })
 
 export type LeadFormData = z.infer<typeof leadFormSchema>

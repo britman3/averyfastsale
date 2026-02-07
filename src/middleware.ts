@@ -15,6 +15,40 @@ async function verifyTokenEdge(token: string): Promise<boolean> {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const host = request.headers.get('host') || ''
+  const domain = process.env.NEXT_PUBLIC_DOMAIN || 'averyfastsale.com'
+
+  // ── Subdomain detection ──
+  // "john-smith.averyfastsale.com" → "john-smith"
+  // "averyfastsale.com" → null
+  // "www.averyfastsale.com" → null (treat www as main)
+  // "localhost:3098" → null (dev mode)
+  let subdomain: string | null = null
+
+  if (host.includes(domain) && host !== domain && !host.startsWith('www.')) {
+    subdomain = host.replace(`.${domain}`, '').split(':')[0]
+  }
+
+  // For local development, support ?subdomain=john-smith query param
+  if (!subdomain && process.env.NODE_ENV === 'development') {
+    subdomain = request.nextUrl.searchParams.get('subdomain')
+  }
+
+  if (subdomain) {
+    // Don't intercept admin or API routes even on subdomains
+    if (pathname.startsWith('/admin') || pathname.startsWith('/api')) {
+      return NextResponse.next()
+    }
+
+    // Rewrite to student site route group
+    const url = request.nextUrl.clone()
+    url.pathname = `/s/${subdomain}${pathname}`
+    const response = NextResponse.rewrite(url)
+    response.headers.set('x-subdomain', subdomain)
+    return response
+  }
+
+  // ── Admin auth protection (main site only) ──
 
   // Skip login page and auth endpoint
   if (pathname === '/admin/login' || pathname === '/api/admin/auth') {
@@ -48,5 +82,8 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/admin/:path*'],
+  matcher: [
+    // Match all paths except static files
+    '/((?!_next/static|_next/image|favicon.ico|uploads|robots.txt).*)',
+  ],
 }

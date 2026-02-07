@@ -101,6 +101,22 @@ async function main() {
   })
   console.log('✓ 3 sample students created')
 
+  // 3b. Create student service areas
+  await prisma.studentServiceArea.createMany({
+    data: [
+      { studentId: johnSmith.id, areaType: 'POSTCODE_PREFIX', areaValue: 'West Midlands', priority: 0 },
+      { studentId: johnSmith.id, areaType: 'TOWN', areaValue: 'Birmingham', priority: 1 },
+      { studentId: johnSmith.id, areaType: 'TOWN', areaValue: 'Wolverhampton', priority: 2 },
+      { studentId: sarahJones.id, areaType: 'POSTCODE_PREFIX', areaValue: 'Greater Manchester', priority: 0 },
+      { studentId: sarahJones.id, areaType: 'TOWN', areaValue: 'Manchester', priority: 1 },
+      { studentId: sarahJones.id, areaType: 'TOWN', areaValue: 'Salford', priority: 2 },
+      { studentId: mikeWilson.id, areaType: 'POSTCODE_PREFIX', areaValue: 'West Yorkshire', priority: 0 },
+      { studentId: mikeWilson.id, areaType: 'TOWN', areaValue: 'Leeds', priority: 1 },
+    ],
+    skipDuplicates: true,
+  })
+  console.log('✓ Student service areas created')
+
   // 4. Create routing rules with targets
   // Rule: B1 exact outward → john-smith (priority 0)
   const ruleB1 = await prisma.routingRule.create({

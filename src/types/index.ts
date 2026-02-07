@@ -4,6 +4,7 @@ export interface LeadFormProps {
   captureMode?: CaptureMode
   studentId?: string
   studentName?: string
+  sourceSubdomainSlug?: string
   compact?: boolean
 }
 
