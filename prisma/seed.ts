@@ -180,6 +180,56 @@ async function main() {
   })
   console.log('✓ Routing rules created')
 
+  // 5. Create homepage CMS page
+  const homePage = await prisma.page.upsert({
+    where: { scope_slug: { scope: 'MAIN', slug: 'home' } },
+    update: {},
+    create: {
+      scope: 'MAIN',
+      slug: 'home',
+      title: 'Home',
+      isPublished: true,
+      sections: {
+        create: [
+          {
+            sectionType: 'HERO',
+            sortOrder: 0,
+            content: {
+              heading: 'Sell Your House Fast',
+              subheading: 'Get a cash offer in 24 hours. No fees, no chains, no hassle.',
+              ctaText: 'Get Your Free Offer',
+            },
+          },
+          {
+            sectionType: 'HOW_IT_WORKS',
+            sortOrder: 1,
+            content: {
+              heading: 'How It Works',
+              steps: [
+                { title: 'Tell Us About Your Property', description: 'Fill in our quick form with your property details.' },
+                { title: 'Get Your Free Offer', description: 'We\'ll provide a no-obligation cash offer within 24 hours.' },
+                { title: 'Complete In Days', description: 'Choose your completion date. We can complete in as little as 7 days.' },
+              ],
+            },
+          },
+          {
+            sectionType: 'CONTENT',
+            sortOrder: 2,
+            content: {
+              heading: 'Why Choose Us',
+              features: [
+                { title: 'No Fees', description: 'We cover all costs including legal fees.' },
+                { title: 'Fast Completion', description: 'Complete in as little as 7 days.' },
+                { title: 'Cash Buyer', description: 'No chains, no mortgage delays.' },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  })
+  console.log('✓ Homepage CMS page created')
+
   console.log('Seeding complete!')
 }
 

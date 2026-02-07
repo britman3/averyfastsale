@@ -1,66 +1,65 @@
-import Link from 'next/link'
+import Link from "next/link";
+
+const navLinks = [
+  { href: "/how-it-works", label: "How It Works" },
+  { href: "/your-options", label: "Your Options" },
+  { href: "/reviews", label: "Reviews" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/contact", label: "Contact" },
+];
+
+const legalLinks = [
+  { href: "/privacy", label: "Privacy" },
+  { href: "/cookies", label: "Cookies" },
+  { href: "/terms", label: "Terms" },
+];
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border-grey bg-navy text-white">
-      <div className="mx-auto max-w-6xl px-4 py-12">
-        <div className="grid gap-8 md:grid-cols-4">
-          {/* Brand */}
-          <div>
-            <p className="font-heading text-lg font-extrabold">
-              A Very <span className="text-green">Fast</span> Sale
-            </p>
-            <p className="mt-2 text-sm text-white/70">
-              Fair cash offers for properties across England and Wales. No fees, no chains, no hassle.
-            </p>
-          </div>
+    <footer className="bg-navy text-white">
+      <div className="mx-auto max-w-7xl px-4 py-12 md:px-8">
+        <div className="flex flex-col items-center gap-8 md:flex-row md:justify-between">
+          {/* Logo */}
+          <Link
+            href="/"
+            className="font-heading text-xl font-extrabold tracking-tight"
+          >
+            A Very&nbsp;<span className="text-green">Fast</span>&nbsp;Sale
+          </Link>
 
-          {/* Quick links */}
-          <div>
-            <h4 className="mb-3 font-heading text-xs font-semibold uppercase tracking-wide text-white/50">
-              Quick Links
-            </h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/how-it-works" className="text-white/70 hover:text-white">How It Works</Link></li>
-              <li><Link href="/your-options" className="text-white/70 hover:text-white">Your Options</Link></li>
-              <li><Link href="/get-offer" className="text-white/70 hover:text-white">Get an Offer</Link></li>
-              <li><Link href="/reviews" className="text-white/70 hover:text-white">Reviews</Link></li>
-              <li><Link href="/faq" className="text-white/70 hover:text-white">FAQ</Link></li>
-            </ul>
-          </div>
+          {/* Nav links */}
+          <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="font-heading text-sm font-medium text-white/80 transition-colors hover:text-white"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
 
-          {/* Situations */}
-          <div>
-            <h4 className="mb-3 font-heading text-xs font-semibold uppercase tracking-wide text-white/50">
-              Situations
-            </h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/situations/probate" className="text-white/70 hover:text-white">Probate</Link></li>
-              <li><Link href="/situations/divorce" className="text-white/70 hover:text-white">Divorce</Link></li>
-              <li><Link href="/situations/arrears" className="text-white/70 hover:text-white">Mortgage Arrears</Link></li>
-              <li><Link href="/situations/tenants" className="text-white/70 hover:text-white">Tenant Problems</Link></li>
-              <li><Link href="/situations/relocating" className="text-white/70 hover:text-white">Relocating</Link></li>
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div>
-            <h4 className="mb-3 font-heading text-xs font-semibold uppercase tracking-wide text-white/50">
-              Legal
-            </h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/privacy" className="text-white/70 hover:text-white">Privacy Policy</Link></li>
-              <li><Link href="/cookies" className="text-white/70 hover:text-white">Cookie Policy</Link></li>
-              <li><Link href="/terms" className="text-white/70 hover:text-white">Terms &amp; Conditions</Link></li>
-              <li><Link href="/contact" className="text-white/70 hover:text-white">Contact Us</Link></li>
-            </ul>
-          </div>
+          {/* Legal links */}
+          <nav className="flex gap-x-6">
+            {legalLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="font-heading text-sm font-medium text-white/60 transition-colors hover:text-white"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
         </div>
 
-        <div className="mt-8 border-t border-white/10 pt-6 text-center text-xs text-white/40">
-          &copy; {new Date().getFullYear()} A Very Fast Sale. All rights reserved.
+        <div className="mt-8 border-t border-white/10 pt-6 text-center">
+          <p className="font-heading text-sm text-white/50">
+            &copy; {new Date().getFullYear()} A Very Fast Sale. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
-  )
+  );
 }

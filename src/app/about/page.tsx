@@ -1,59 +1,90 @@
-import type { Metadata } from 'next'
-import Navbar from '@/components/layout/Navbar'
-import Footer from '@/components/layout/Footer'
-import CTAPanel from '@/components/sections/CTAPanel'
+import type { Metadata } from "next";
+import HeroBanner from "@/components/sections/HeroBanner";
+import CTAPanel from "@/components/sections/CTAPanel";
 
 export const metadata: Metadata = {
-  title: 'About Us | A Very Fast Sale',
+  title: "About | A Very Fast Sale",
   description:
-    'Learn about A Very Fast Sale — our mission, values, and commitment to helping homeowners sell their properties quickly and fairly.',
-}
+    "Learn about A Very Fast Sale and our mission to help homeowners sell quickly and fairly.",
+};
+
+const values = [
+  {
+    title: "Honesty",
+    description: "We tell you exactly what we can offer and why. No inflated promises, no bait-and-switch tactics.",
+  },
+  {
+    title: "Speed",
+    description: "We move quickly because we know time matters. Most offers are delivered within 24 to 48 hours.",
+  },
+  {
+    title: "Fairness",
+    description: "Our offers are based on real market data. We aim to give you the best price for a fast, certain sale.",
+  },
+  {
+    title: "No Pressure",
+    description: "Every offer is no-obligation. We will never pressure you to accept or rush your decision.",
+  },
+];
 
 export default function AboutPage() {
   return (
     <>
-      <Navbar />
-      <main>
-        <section className="bg-navy py-16">
-          <div className="mx-auto max-w-3xl px-4 text-center">
-            <h1 className="font-heading text-4xl font-extrabold text-white">
-              About A Very Fast Sale
-            </h1>
-            <p className="mt-4 text-lg text-white/80">
-              We help homeowners across England and Wales sell their properties quickly, fairly, and without the usual stress.
+      <HeroBanner title="About A Very Fast Sale" />
+
+      <section className="py-16 md:py-24">
+        <div className="mx-auto max-w-3xl px-4 md:px-8">
+          <h2 className="font-heading text-2xl font-bold text-navy">
+            Our Story
+          </h2>
+          <p className="mt-4 leading-relaxed text-ink">
+            A Very Fast Sale was created to give homeowners a genuine, no-nonsense
+            route to selling their property quickly. We understand that life throws
+            curveballs — whether it is probate, divorce, financial difficulty, or
+            simply wanting a fresh start — and sometimes you need a fast, certain
+            sale without the stress of estate agents, chains, and months of
+            waiting.
+          </p>
+
+          <h2 className="mt-12 font-heading text-2xl font-bold text-navy">
+            Our Mission
+          </h2>
+          <p className="mt-4 leading-relaxed text-ink">
+            Our mission is simple: make fair cash offers, move quickly, and treat
+            every seller with respect and transparency.
+          </p>
+
+          <h2 className="mt-12 font-heading text-2xl font-bold text-navy">
+            Our Values
+          </h2>
+          <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
+            {values.map((v) => (
+              <div
+                key={v.title}
+                className="rounded-2xl border border-border-grey bg-white p-5"
+              >
+                <h3 className="font-heading text-lg font-bold text-navy">
+                  {v.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-grey">
+                  {v.description}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <h2 className="mt-12 font-heading text-2xl font-bold text-navy">
+            Our Team
+          </h2>
+          <div className="mt-6 rounded-2xl border border-border-grey bg-light-grey p-8 text-center">
+            <p className="text-sm text-grey">
+              Team profiles coming soon.
             </p>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="py-16">
-          <div className="mx-auto max-w-3xl space-y-8 px-4">
-            <div>
-              <h2 className="font-heading text-2xl font-bold text-navy">Our Mission</h2>
-              <p className="mt-3 text-ink/70">
-                We believe selling a house shouldn&apos;t take months of uncertainty, endless viewings, and unexpected costs. Our mission is to provide a genuine alternative — a fast, fair cash offer with no fees, no chains, and no obligation.
-              </p>
-            </div>
-            <div>
-              <h2 className="font-heading text-2xl font-bold text-navy">How We&apos;re Different</h2>
-              <p className="mt-3 text-ink/70">
-                Unlike traditional estate agents, we buy properties directly for cash. This means no waiting for mortgage approvals, no chains that can collapse, and no commission fees. We handle the solicitors, the paperwork, and the timeline — you just choose when you want to complete.
-              </p>
-            </div>
-            <div>
-              <h2 className="font-heading text-2xl font-bold text-navy">Our Values</h2>
-              <ul className="mt-3 space-y-2 text-ink/70">
-                <li><strong>Transparency:</strong> No hidden fees, no pressure tactics, no small print.</li>
-                <li><strong>Speed:</strong> We make offers within 24–48 hours and can complete in as little as 7 days.</li>
-                <li><strong>Fairness:</strong> Our offers are based on genuine market research and property valuation.</li>
-                <li><strong>Respect:</strong> We understand every seller&apos;s situation is unique and treat each case with care.</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <CTAPanel />
-      </main>
-      <Footer />
+      <CTAPanel />
     </>
-  )
+  );
 }

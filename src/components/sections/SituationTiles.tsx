@@ -1,36 +1,71 @@
-import Link from 'next/link'
+import Link from "next/link";
 
 const situations = [
-  { slug: 'probate', label: 'Probate / Inherited', icon: '📋' },
-  { slug: 'divorce', label: 'Divorce / Separation', icon: '💔' },
-  { slug: 'arrears', label: 'Mortgage Arrears', icon: '⚠️' },
-  { slug: 'tenants', label: 'Tenant Problems', icon: '🏚️' },
-  { slug: 'relocating', label: 'Relocating', icon: '✈️' },
-  { slug: 'downsizing', label: 'Downsizing', icon: '🏡' },
-]
+  {
+    emoji: "\u{1F4DC}",
+    title: "Probate / Inherited",
+    description: "Sell an inherited property quickly without the stress.",
+    href: "/situations/probate",
+  },
+  {
+    emoji: "\u{1F494}",
+    title: "Divorce / Separation",
+    description: "Move forward with a fast, clean property sale.",
+    href: "/situations/divorce",
+  },
+  {
+    emoji: "\u{1F3E6}",
+    title: "Mortgage Arrears",
+    description: "Avoid repossession with a quick cash sale.",
+    href: "/situations/arrears",
+  },
+  {
+    emoji: "\u{1F511}",
+    title: "Tenant Problems",
+    description: "Sell your rental property with tenants in situ.",
+    href: "/situations/tenants",
+  },
+  {
+    emoji: "\u2708\uFE0F",
+    title: "Relocating",
+    description: "Need to move fast? Sell your home on your timeline.",
+    href: "/situations/relocating",
+  },
+  {
+    emoji: "\u{1F3E1}",
+    title: "Downsizing",
+    description: "Downsize without the hassle of the open market.",
+    href: "/situations/downsizing",
+  },
+];
 
 export default function SituationTiles() {
   return (
-    <section className="bg-light-grey py-16">
-      <div className="mx-auto max-w-6xl px-4">
-        <h2 className="text-center font-heading text-3xl font-bold text-navy">
+    <section className="bg-warm-white py-16 md:py-24">
+      <div className="mx-auto max-w-7xl px-4 md:px-8">
+        <h2 className="text-center font-heading text-2xl font-bold text-navy md:text-3xl">
           Whatever Your Situation, We Can Help
         </h2>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-          {situations.map((s) => (
+
+        <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {situations.map((item) => (
             <Link
-              key={s.slug}
-              href={`/situations/${s.slug}`}
-              className="flex items-center gap-3 rounded-2xl border border-border-grey bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+              key={item.href}
+              href={item.href}
+              className="group rounded-2xl bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
             >
-              <span className="text-2xl">{s.icon}</span>
-              <span className="font-heading text-base font-semibold text-navy">
-                {s.label}
+              <span className="text-3xl">{item.emoji}</span>
+              <h3 className="mt-3 font-heading text-lg font-bold text-navy">
+                {item.title}
+              </h3>
+              <p className="mt-1 text-sm text-grey">{item.description}</p>
+              <span className="mt-3 inline-block font-heading text-sm font-semibold text-green transition-colors group-hover:text-green-dark">
+                Learn more &rarr;
               </span>
             </Link>
           ))}
         </div>
       </div>
     </section>
-  )
+  );
 }

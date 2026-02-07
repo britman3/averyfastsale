@@ -371,7 +371,7 @@ export default function LeadForm({
 
           <Input
             name="approxValue"
-            label="Approx. Property Value (£)"
+            label="Approx. Property Value (&pound;)"
             placeholder="e.g. 150000"
             value={approxValue}
             onChange={(e) => setApproxValue(e.target.value)}

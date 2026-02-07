@@ -1,29 +1,40 @@
 @import "tailwindcss";
 
-@theme {
-  --color-navy: #0B1F3B;
-  --color-green: #1F8A5B;
+@theme inline {
+  --color-navy: #0B1D3A;
+  --color-navy-light: #132B52;
+  --color-green: #1EA853;
+  --color-green-dark: #178A43;
   --color-green-hover: #176D48;
-  --color-amber: #F2A900;
-  --color-amber-light: #FFF4D6;
-  --color-ink: #111827;
-  --color-warm-white: #F8FAFC;
+  --color-green-light: #E8F5EC;
+  --color-amber: #F5A623;
+  --color-amber-light: #FFF4E0;
+  --color-ink: #2D2D2D;
+  --color-grey: #6B7280;
+  --color-border-grey: #E2E8F0;
+  --color-warm-white: #FAFAF8;
   --color-light-grey: #EEF2F6;
-  --color-border-grey: #D7DEE8;
   --color-error: #B42318;
+  --font-heading: "Montserrat", system-ui, sans-serif;
+  --font-body: "Source Serif 4", Georgia, serif;
+}
 
-  --font-heading: 'Montserrat', sans-serif;
-  --font-body: 'Source Serif 4', serif;
+* {
+  box-sizing: border-box;
 }
 
 body {
-  font-family: var(--font-body);
+  background: #ffffff;
   color: var(--color-ink);
-  background-color: var(--color-warm-white);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
+  color: var(--color-navy);
+  line-height: 1.2;
 }
 
 /* Honeypot field - visually hidden but present in DOM */

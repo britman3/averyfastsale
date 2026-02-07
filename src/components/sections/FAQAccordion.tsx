@@ -1,88 +1,130 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
+import { useState } from "react";
 
 interface FAQItem {
-  question: string
-  answer: string
+  question: string;
+  answer: string;
 }
 
 const defaultFAQs: FAQItem[] = [
   {
-    question: 'How quickly can you buy my house?',
+    question: "How quickly can you buy my house?",
     answer:
-      'We can make an offer within 24–48 hours and complete in as little as 7 days, though most sales complete in 2–4 weeks.',
+      "We can complete a purchase in as little as 7 days, although most sales complete within 2 to 4 weeks. You choose the timeline that works best for you.",
   },
   {
-    question: 'Do I have to pay any fees?',
+    question: "Are there any fees or commissions?",
     answer:
-      'No. There are no fees, no commissions, and no hidden charges.',
+      "No. There are no fees, no commissions, and no hidden charges. We cover our own legal costs and there is no obligation at any stage.",
   },
   {
-    question: 'What if my house needs work?',
+    question: "How do you calculate your offer?",
     answer:
-      'We buy houses in any condition. No repairs or cleaning needed.',
+      "We base our offers on current market data, recent comparable sales, and the condition of the property. We aim to offer a fair price that reflects the speed and certainty of a cash sale.",
   },
   {
-    question: 'Am I under any obligation?',
+    question: "Do I need to make repairs before selling?",
     answer:
-      'Absolutely not. Our offer is free and there is no obligation to accept.',
+      "No. We buy properties in any condition. There is no need to redecorate, repair, or even clean the property before selling to us.",
   },
   {
-    question: 'How do you calculate your offer?',
+    question: "Is your offer guaranteed?",
     answer:
-      'We assess the property based on its location, condition, and current market value, then make a fair cash offer.',
+      "Our initial offer is subject to a survey and basic due diligence, which we carry out at our own cost. In most cases, the final offer matches the initial figure.",
   },
   {
-    question: 'What types of property do you buy?',
+    question: "Can you buy any type of property?",
     answer:
-      'We buy houses, flats, bungalows, and land across England and Wales.',
+      "We buy houses, flats, bungalows, commercial properties, land, and properties with sitting tenants. If you are unsure whether we can help, get in touch and we will let you know.",
   },
-]
+  {
+    question: "Do you buy properties with sitting tenants?",
+    answer:
+      "Yes. We regularly buy properties with tenants in situ. The tenants can remain in the property after the sale if needed.",
+  },
+  {
+    question: "What areas do you cover?",
+    answer:
+      "We buy properties across England and Wales. Whether you are in a city centre or a rural area, we can help.",
+  },
+  {
+    question: "Am I obligated to accept your offer?",
+    answer:
+      "Absolutely not. Our offers are completely no-obligation. If you decide not to proceed, that is perfectly fine.",
+  },
+  {
+    question: "How is this different from an estate agent?",
+    answer:
+      "Estate agents list your property on the open market and wait for a buyer. We are the buyer. That means no viewings, no chains, no fall-throughs, and no waiting months for a sale.",
+  },
+  {
+    question: "Will you value my property for free?",
+    answer:
+      "Yes. We provide a free, no-obligation valuation and cash offer on every property.",
+  },
+  {
+    question: "Can I stay in the property after selling?",
+    answer:
+      "In many cases, yes. We can discuss rent-back arrangements or flexible completion dates to suit your needs.",
+  },
+];
 
-export default function FAQAccordion({ items }: { items?: FAQItem[] }) {
-  const faqs = items || defaultFAQs
-  const [openIndex, setOpenIndex] = useState<number | null>(null)
+export default function FAQAccordion({ items = defaultFAQs }: { items?: FAQItem[] }) {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section className="py-16">
-      <div className="mx-auto max-w-3xl px-4">
-        <h2 className="text-center font-heading text-3xl font-bold text-navy">
+    <section className="py-16 md:py-24">
+      <div className="mx-auto max-w-3xl px-4 md:px-8">
+        <h2 className="text-center font-heading text-2xl font-bold text-navy md:text-3xl">
           Frequently Asked Questions
         </h2>
-        <div className="mt-10 space-y-3">
-          {faqs.map((faq, i) => (
-            <div
-              key={i}
-              className="rounded-xl border border-border-grey bg-white"
-            >
-              <button
-                className="flex w-full items-center justify-between p-5 text-left"
-                onClick={() => setOpenIndex(openIndex === i ? null : i)}
+
+        <div className="mt-10 flex flex-col gap-2">
+          {items.map((item, idx) => {
+            const isOpen = openIndex === idx;
+            return (
+              <div
+                key={idx}
+                className="rounded-xl border border-border-grey bg-white"
               >
-                <span className="font-heading text-base font-semibold text-navy">
-                  {faq.question}
-                </span>
-                <svg
-                  className={`h-5 w-5 shrink-0 text-navy transition-transform ${
-                    openIndex === i ? 'rotate-180' : ''
-                  }`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+                <button
+                  onClick={() => setOpenIndex(isOpen ? null : idx)}
+                  className="flex w-full items-center justify-between px-5 py-4 text-left"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {openIndex === i && (
-                <div className="border-t border-border-grey px-5 pb-5 pt-3 text-ink/70">
-                  {faq.answer}
+                  <span className="font-heading text-sm font-bold text-navy md:text-base">
+                    {item.question}
+                  </span>
+                  <svg
+                    className={`h-5 w-5 flex-shrink-0 text-grey transition-transform duration-200 ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+                <div
+                  className={`overflow-hidden transition-all duration-200 ${
+                    isOpen ? "max-h-96 pb-4" : "max-h-0"
+                  }`}
+                >
+                  <p className="px-5 text-sm leading-relaxed text-ink">
+                    {item.answer}
+                  </p>
                 </div>
-              )}
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
-  )
+  );
 }

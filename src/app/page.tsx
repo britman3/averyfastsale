@@ -1,17 +1,14 @@
-import Navbar from '@/components/layout/Navbar'
-import Footer from '@/components/layout/Footer'
-import Hero from '@/components/sections/Hero'
-import TrustBar from '@/components/sections/TrustBar'
-import SituationTiles from '@/components/sections/SituationTiles'
-import HowItWorks from '@/components/sections/HowItWorks'
-import Testimonials from '@/components/sections/Testimonials'
-import FAQAccordion from '@/components/sections/FAQAccordion'
-import CTAPanel from '@/components/sections/CTAPanel'
+import Hero from "@/components/sections/Hero";
+import TrustBar from "@/components/sections/TrustBar";
+import SituationTiles from "@/components/sections/SituationTiles";
+import HowItWorks from "@/components/sections/HowItWorks";
+import Testimonials from "@/components/sections/Testimonials";
+import FAQAccordion from "@/components/sections/FAQAccordion";
+import CTAPanel from "@/components/sections/CTAPanel";
 
 export default function HomePage() {
   return (
     <>
-      <Navbar />
       <Hero />
       <TrustBar />
       <SituationTiles />
@@ -19,7 +16,6 @@ export default function HomePage() {
       <Testimonials />
       <FAQAccordion />
       <CTAPanel />
-      <Footer />
     </>
-  )
+  );
 }

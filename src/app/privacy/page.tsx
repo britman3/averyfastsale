@@ -1,51 +1,147 @@
-import type { Metadata } from 'next'
-import Navbar from '@/components/layout/Navbar'
-import Footer from '@/components/layout/Footer'
+import type { Metadata } from "next";
+import HeroBanner from "@/components/sections/HeroBanner";
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | A Very Fast Sale',
-  description: 'How A Very Fast Sale collects, uses, and protects your personal data.',
-}
+  title: "Privacy Policy | A Very Fast Sale",
+  description: "How A Very Fast Sale collects, uses, and protects your personal data.",
+};
 
 export default function PrivacyPage() {
   return (
     <>
-      <Navbar />
-      <main className="py-12">
-        <div className="mx-auto max-w-3xl px-4">
-          <h1 className="mb-8 font-heading text-3xl font-extrabold text-navy">Privacy Policy</h1>
-          <div className="space-y-6 text-ink/80 leading-relaxed">
-            <p>Last updated: February 2026</p>
-            <h2 className="font-heading text-xl font-bold text-navy">1. Who We Are</h2>
-            <p>A Very Fast Sale (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) is committed to protecting your privacy. This policy explains how we collect, use, and protect your personal data when you use our website and services.</p>
+      <HeroBanner title="Privacy Policy" />
 
-            <h2 className="font-heading text-xl font-bold text-navy">2. What Data We Collect</h2>
-            <p>When you submit a form on our website, we collect: your name, phone number, email address (optional), property address, postcode, approximate property value, reason for sale, timeline, and consent information including timestamp and IP address.</p>
-            <p>We also collect technical data including UTM parameters, referrer URL, and browser information for analytics purposes.</p>
+      <section className="py-16 md:py-24">
+        <div className="mx-auto max-w-3xl px-4 md:px-8">
+          <div className="prose-navy flex flex-col gap-8">
+            <div>
+              <h2 className="font-heading text-xl font-bold text-navy">
+                Who we are
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink">
+                A Very Fast Sale is a property buying company operating across
+                England and Wales. We are the data controller for the personal
+                information we collect through our website and services.
+              </p>
+            </div>
 
-            <h2 className="font-heading text-xl font-bold text-navy">3. How We Use Your Data</h2>
-            <p>We use your data to: provide you with a property valuation and cash offer, connect you with a local property specialist, communicate with you about our services, and improve our website and services.</p>
+            <div>
+              <h2 className="font-heading text-xl font-bold text-navy">
+                What data we collect
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink">
+                When you use our website or contact us, we may collect the
+                following personal data:
+              </p>
+              <ul className="mt-2 list-disc space-y-1 pl-6 text-ink">
+                <li>Full name</li>
+                <li>Email address</li>
+                <li>Phone number</li>
+                <li>Property address and postcode</li>
+                <li>Approximate property value</li>
+                <li>Reason for selling and preferred timeline</li>
+                <li>Any additional information you provide in correspondence</li>
+              </ul>
+            </div>
 
-            <h2 className="font-heading text-xl font-bold text-navy">4. Legal Basis for Processing</h2>
-            <p>We process your data based on: your consent (when you submit a form and check the consent box), our legitimate interest in providing property buying services, and legal obligations (anti-money laundering regulations).</p>
+            <div>
+              <h2 className="font-heading text-xl font-bold text-navy">
+                Why we collect your data
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink">
+                We use your personal data for the following purposes:
+              </p>
+              <ul className="mt-2 list-disc space-y-1 pl-6 text-ink">
+                <li>To provide you with a cash offer on your property</li>
+                <li>To contact you about your enquiry</li>
+                <li>To progress a property purchase if you accept our offer</li>
+                <li>To send you relevant communications (with your consent)</li>
+                <li>To comply with legal obligations</li>
+              </ul>
+            </div>
 
-            <h2 className="font-heading text-xl font-bold text-navy">5. Data Sharing</h2>
-            <p>We may share your data with: our local property specialists who will contact you about your property, our solicitors and legal partners involved in any transaction, and service providers who help us operate our business (hosting, email).</p>
-            <p>We will never sell your data to third parties for marketing purposes.</p>
+            <div>
+              <h2 className="font-heading text-xl font-bold text-navy">
+                How we store your data
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink">
+                Your data is stored securely using industry-standard encryption.
+                We use trusted third-party service providers including Resend for
+                email communications. All data is stored within the UK or EEA
+                and is protected by appropriate technical and organisational
+                measures.
+              </p>
+            </div>
 
-            <h2 className="font-heading text-xl font-bold text-navy">6. Data Retention</h2>
-            <p>We retain your data for as long as necessary to provide our services, typically up to 6 years after your last interaction with us, in line with UK legal requirements.</p>
+            <div>
+              <h2 className="font-heading text-xl font-bold text-navy">
+                Who we share your data with
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink">
+                We may share your data with:
+              </p>
+              <ul className="mt-2 list-disc space-y-1 pl-6 text-ink">
+                <li>Solicitors and conveyancers involved in a property transaction</li>
+                <li>Surveyors instructed to value your property</li>
+                <li>Email service providers (Resend) for communications</li>
+                <li>Law enforcement or regulatory bodies where required by law</li>
+              </ul>
+              <p className="mt-2 leading-relaxed text-ink">
+                We will never sell your personal data to third parties.
+              </p>
+            </div>
 
-            <h2 className="font-heading text-xl font-bold text-navy">7. Your Rights</h2>
-            <p>Under the UK GDPR, you have the right to: access your personal data, correct inaccurate data, request deletion of your data, restrict processing, data portability, and object to processing.</p>
-            <p>To exercise any of these rights, contact us at privacy@averyfastsale.com.</p>
+            <div>
+              <h2 className="font-heading text-xl font-bold text-navy">
+                Data retention
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink">
+                We retain your personal data for as long as necessary to fulfil
+                the purposes for which it was collected. Enquiry data is retained
+                for up to 24 months after your last interaction with us.
+                Transaction data is retained for 6 years to comply with legal
+                and regulatory requirements.
+              </p>
+            </div>
 
-            <h2 className="font-heading text-xl font-bold text-navy">8. Contact Us</h2>
-            <p>If you have questions about this privacy policy, contact us at: privacy@averyfastsale.com</p>
+            <div>
+              <h2 className="font-heading text-xl font-bold text-navy">
+                Your rights
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink">
+                Under UK GDPR, you have the right to:
+              </p>
+              <ul className="mt-2 list-disc space-y-1 pl-6 text-ink">
+                <li>Access the personal data we hold about you</li>
+                <li>Request correction of inaccurate data</li>
+                <li>Request deletion of your data</li>
+                <li>Object to or restrict processing of your data</li>
+                <li>Data portability</li>
+                <li>Withdraw consent at any time</li>
+              </ul>
+              <p className="mt-2 leading-relaxed text-ink">
+                To exercise any of these rights, contact us at
+                hello@averyfastsale.com. If you are not satisfied with our
+                response, you have the right to complain to the Information
+                Commissioner&apos;s Office (ICO) at ico.org.uk.
+              </p>
+            </div>
+
+            <div>
+              <h2 className="font-heading text-xl font-bold text-navy">
+                Changes to this policy
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink">
+                We may update this privacy policy from time to time. Any changes
+                will be posted on this page with an updated effective date.
+              </p>
+              <p className="mt-2 text-sm text-grey">
+                Last updated: February 2026
+              </p>
+            </div>
           </div>
         </div>
-      </main>
-      <Footer />
+      </section>
     </>
-  )
+  );
 }

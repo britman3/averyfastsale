@@ -1,94 +1,112 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Link from 'next/link'
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
+
+const navLinks = [
+  { href: "/how-it-works", label: "How It Works" },
+  { href: "/your-options", label: "Your Options" },
+  { href: "/reviews", label: "Reviews" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/contact", label: "Contact" },
+];
 
 export default function Navbar() {
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border-grey bg-white">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link href="/" className="font-heading text-xl font-extrabold text-navy">
-          A Very <span className="text-green">Fast</span> Sale
+    <header
+      className={`sticky top-0 z-50 bg-white transition-shadow duration-200 ${
+        scrolled ? "shadow-md" : ""
+      }`}
+    >
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-8">
+        <Link href="/" className="flex items-center gap-0 font-heading text-xl font-extrabold tracking-tight text-navy md:text-2xl">
+          A Very&nbsp;<span className="text-green">Fast</span>&nbsp;Sale
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden items-center gap-6 md:flex">
-          <Link href="/how-it-works" className="text-sm font-medium text-navy hover:text-green">
-            How It Works
-          </Link>
-          <Link href="/your-options" className="text-sm font-medium text-navy hover:text-green">
-            Your Options
-          </Link>
-          <Link href="/reviews" className="text-sm font-medium text-navy hover:text-green">
-            Reviews
-          </Link>
-          <Link href="/faq" className="text-sm font-medium text-navy hover:text-green">
-            FAQ
-          </Link>
-          <Link href="/about" className="text-sm font-medium text-navy hover:text-green">
-            About
-          </Link>
-          <Link href="/contact" className="text-sm font-medium text-navy hover:text-green">
-            Contact
-          </Link>
+        <nav className="hidden items-center gap-6 md:flex">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`font-heading text-sm font-semibold transition-colors hover:text-green ${
+                pathname === link.href ? "text-green" : "text-navy"
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
           <Link
             href="/get-offer"
-            className="rounded-[12px] bg-green px-6 py-2.5 font-heading text-sm font-bold text-white hover:bg-green-hover"
+            className="rounded-xl bg-green px-5 py-2.5 font-heading text-sm font-bold text-white transition-colors hover:bg-green-dark"
           >
-            Get My Offer
+            Get Offer
           </Link>
-        </div>
+        </nav>
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden"
+          className="flex flex-col gap-1.5 md:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label="Toggle menu"
         >
-          <svg className="h-6 w-6 text-navy" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            {mobileOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
+          <span
+            className={`block h-0.5 w-6 bg-navy transition-transform ${
+              mobileOpen ? "translate-y-2 rotate-45" : ""
+            }`}
+          />
+          <span
+            className={`block h-0.5 w-6 bg-navy transition-opacity ${
+              mobileOpen ? "opacity-0" : ""
+            }`}
+          />
+          <span
+            className={`block h-0.5 w-6 bg-navy transition-transform ${
+              mobileOpen ? "-translate-y-2 -rotate-45" : ""
+            }`}
+          />
         </button>
       </div>
 
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="border-t border-border-grey bg-white px-4 pb-4 md:hidden">
-          <div className="flex flex-col gap-3 pt-3">
-            <Link href="/how-it-works" className="text-sm font-medium text-navy" onClick={() => setMobileOpen(false)}>
-              How It Works
-            </Link>
-            <Link href="/your-options" className="text-sm font-medium text-navy" onClick={() => setMobileOpen(false)}>
-              Your Options
-            </Link>
-            <Link href="/reviews" className="text-sm font-medium text-navy" onClick={() => setMobileOpen(false)}>
-              Reviews
-            </Link>
-            <Link href="/faq" className="text-sm font-medium text-navy" onClick={() => setMobileOpen(false)}>
-              FAQ
-            </Link>
-            <Link href="/about" className="text-sm font-medium text-navy" onClick={() => setMobileOpen(false)}>
-              About
-            </Link>
-            <Link href="/contact" className="text-sm font-medium text-navy" onClick={() => setMobileOpen(false)}>
-              Contact
-            </Link>
+      {/* Mobile drawer */}
+      <div
+        className={`fixed inset-0 top-[56px] z-40 bg-white transition-transform duration-300 md:hidden ${
+          mobileOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <nav className="flex flex-col gap-1 px-6 pt-6">
+          {navLinks.map((link) => (
             <Link
-              href="/get-offer"
-              className="mt-2 rounded-[12px] bg-green px-6 py-2.5 text-center font-heading text-sm font-bold text-white"
+              key={link.href}
+              href={link.href}
               onClick={() => setMobileOpen(false)}
+              className={`rounded-lg px-4 py-3 font-heading text-lg font-semibold transition-colors hover:bg-light-grey ${
+                pathname === link.href ? "text-green" : "text-navy"
+              }`}
             >
-              Get My Offer
+              {link.label}
             </Link>
-          </div>
-        </div>
-      )}
-    </nav>
-  )
+          ))}
+          <Link
+            href="/get-offer"
+            onClick={() => setMobileOpen(false)}
+            className="mt-4 rounded-xl bg-green px-5 py-3 text-center font-heading text-lg font-bold text-white transition-colors hover:bg-green-dark"
+          >
+            Get Offer
+          </Link>
+        </nav>
+      </div>
+    </header>
+  );
 }

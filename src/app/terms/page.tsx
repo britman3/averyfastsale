@@ -1,46 +1,128 @@
-import type { Metadata } from 'next'
-import Navbar from '@/components/layout/Navbar'
-import Footer from '@/components/layout/Footer'
+import type { Metadata } from "next";
+import HeroBanner from "@/components/sections/HeroBanner";
 
 export const metadata: Metadata = {
-  title: 'Terms & Conditions | A Very Fast Sale',
-  description: 'Terms and conditions for using the A Very Fast Sale website and services.',
-}
+  title: "Terms and Conditions | A Very Fast Sale",
+  description: "Terms and conditions for using the A Very Fast Sale website and services.",
+};
 
 export default function TermsPage() {
   return (
     <>
-      <Navbar />
-      <main className="py-12">
-        <div className="mx-auto max-w-3xl px-4">
-          <h1 className="mb-8 font-heading text-3xl font-extrabold text-navy">Terms &amp; Conditions</h1>
-          <div className="space-y-6 text-ink/80 leading-relaxed">
-            <p>Last updated: February 2026</p>
+      <HeroBanner title="Terms and Conditions" />
 
-            <h2 className="font-heading text-xl font-bold text-navy">1. Introduction</h2>
-            <p>These terms and conditions govern your use of the A Very Fast Sale website (averyfastsale.com) and our property buying services.</p>
+      <section className="py-16 md:py-24">
+        <div className="mx-auto max-w-3xl px-4 md:px-8">
+          <div className="flex flex-col gap-8">
+            <div>
+              <h2 className="font-heading text-xl font-bold text-navy">
+                Introduction
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink">
+                These terms and conditions govern your use of the A Very Fast
+                Sale website and our property buying services. By using this
+                website, you accept these terms in full.
+              </p>
+            </div>
 
-            <h2 className="font-heading text-xl font-bold text-navy">2. Our Service</h2>
-            <p>A Very Fast Sale provides property buying services. We make cash offers on residential properties across England and Wales. All offers are subject to survey, verification, and our standard due diligence.</p>
+            <div>
+              <h2 className="font-heading text-xl font-bold text-navy">
+                Our service
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink">
+                A Very Fast Sale provides cash offers on residential and
+                commercial properties across England and Wales. We act as a
+                principal buyer or may connect sellers with third-party buyers
+                within our network. In all cases, the terms of any sale will be
+                clearly communicated before you enter into any agreement.
+              </p>
+            </div>
 
-            <h2 className="font-heading text-xl font-bold text-navy">3. No Guarantees</h2>
-            <p>While we strive to provide fair offers and complete transactions quickly, we do not guarantee: any specific offer price, completion within any specific timeframe, or that we will be able to purchase every property submitted to us.</p>
+            <div>
+              <h2 className="font-heading text-xl font-bold text-navy">
+                Offers and valuations
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink">
+                All offers provided through this website or by our team are
+                subject to survey, due diligence, and verification of property
+                details. An initial offer is an indication of price and is not
+                legally binding until contracts are exchanged. We do not
+                guarantee any specific price or timeline for completion.
+              </p>
+            </div>
 
-            <h2 className="font-heading text-xl font-bold text-navy">4. Your Obligations</h2>
-            <p>When submitting your details, you confirm that: the information provided is accurate, you are the property owner or have authority to sell, and you consent to being contacted about your property.</p>
+            <div>
+              <h2 className="font-heading text-xl font-bold text-navy">
+                No guarantees
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink">
+                While we endeavour to provide accurate information and fair
+                offers, we make no guarantees regarding:
+              </p>
+              <ul className="mt-2 list-disc space-y-1 pl-6 text-ink">
+                <li>The final offer price (which may change following survey)</li>
+                <li>The timeline for completion</li>
+                <li>The availability of our services for any particular property</li>
+              </ul>
+            </div>
 
-            <h2 className="font-heading text-xl font-bold text-navy">5. Limitation of Liability</h2>
-            <p>A Very Fast Sale shall not be liable for any indirect, incidental, or consequential losses arising from the use of our website or services.</p>
+            <div>
+              <h2 className="font-heading text-xl font-bold text-navy">
+                Limitation of liability
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink">
+                To the fullest extent permitted by law, A Very Fast Sale shall
+                not be liable for any indirect, incidental, special, or
+                consequential damages arising from your use of this website or
+                our services. Our total liability shall not exceed the value of
+                any transaction between us.
+              </p>
+              <p className="mt-2 leading-relaxed text-ink">
+                Nothing in these terms excludes or limits liability for death or
+                personal injury caused by negligence, fraud, or any other
+                liability that cannot be excluded by law.
+              </p>
+            </div>
 
-            <h2 className="font-heading text-xl font-bold text-navy">6. Governing Law</h2>
-            <p>These terms are governed by the laws of England and Wales.</p>
+            <div>
+              <h2 className="font-heading text-xl font-bold text-navy">
+                Intellectual property
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink">
+                All content on this website, including text, images, logos, and
+                design, is the property of A Very Fast Sale and is protected by
+                copyright. You may not reproduce, distribute, or use any content
+                without our written permission.
+              </p>
+            </div>
 
-            <h2 className="font-heading text-xl font-bold text-navy">7. Contact</h2>
-            <p>For questions about these terms, contact us at legal@averyfastsale.com.</p>
+            <div>
+              <h2 className="font-heading text-xl font-bold text-navy">
+                Governing law
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink">
+                These terms are governed by the laws of England and Wales. Any
+                disputes shall be subject to the exclusive jurisdiction of the
+                courts of England and Wales.
+              </p>
+            </div>
+
+            <div>
+              <h2 className="font-heading text-xl font-bold text-navy">
+                Changes to these terms
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink">
+                We may revise these terms at any time. Continued use of the
+                website after changes constitutes acceptance of the updated
+                terms.
+              </p>
+              <p className="mt-2 text-sm text-grey">
+                Last updated: February 2026
+              </p>
+            </div>
           </div>
         </div>
-      </main>
-      <Footer />
+      </section>
     </>
-  )
+  );
 }

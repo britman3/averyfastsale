@@ -83,7 +83,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Match all paths except static files
+    // Match all paths except static files (broad matcher needed for subdomain routing)
     '/((?!_next/static|_next/image|favicon.ico|uploads|robots.txt).*)',
   ],
 }
