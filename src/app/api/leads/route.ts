@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { leadFormSchema, normalisePostcode } from '@/lib/validation'
 import { routeLeadFull } from '@/lib/routing'
+import {
+  sendSellerConfirmation,
+  sendStudentLeadAlert,
+  sendAdminLeadAlert,
+  sendUnroutedLeadAlert,
+} from '@/lib/email'
 
 function getClientIp(request: NextRequest): string {
   const forwarded = request.headers.get('x-forwarded-for')
@@ -87,7 +93,7 @@ export async function POST(request: NextRequest) {
         utmTerm: data.utmTerm || null,
         utmContent: data.utmContent || null,
         referrerUrl: data.referrerUrl || null,
-        assignedStudentId: null, // Phase 3 adds routing
+        assignedStudentId: null,
       },
     })
 
@@ -106,10 +112,18 @@ export async function POST(request: NextRequest) {
     // Route the lead
     const assignedStudentId = await routeLeadFull(lead.postcode, lead.townCity)
 
+    // Fetch assigned student details (needed for emails)
+    let assignedStudent: { id: string; email: string; displayName: string } | null = null
+
     if (assignedStudentId) {
       await prisma.lead.update({
         where: { id: lead.id },
         data: { assignedStudentId },
+      })
+
+      assignedStudent = await prisma.student.findUnique({
+        where: { id: assignedStudentId },
+        select: { id: true, email: true, displayName: true },
       })
 
       await prisma.leadActivity.create({
@@ -128,6 +142,64 @@ export async function POST(request: NextRequest) {
         },
       })
     }
+
+    // ── Send emails (fire and forget) ──
+    const emailPromises: Promise<{ success: boolean; error?: string }>[] = []
+
+    // 1. Seller confirmation (if email provided)
+    if (lead.email) {
+      emailPromises.push(sendSellerConfirmation(lead as { fullName: string; email: string; postcode: string; addressLine1: string }))
+    }
+
+    // 2. Student alert (if assigned)
+    if (assignedStudent) {
+      emailPromises.push(
+        sendStudentLeadAlert(assignedStudent.email, assignedStudent.displayName, lead),
+      )
+    }
+
+    // 3. Admin alert (always)
+    emailPromises.push(sendAdminLeadAlert(lead, assignedStudent?.displayName))
+
+    // 4. Unrouted warning (if no student assigned)
+    if (!assignedStudentId) {
+      emailPromises.push(sendUnroutedLeadAlert(lead))
+    }
+
+    // Log email activities (don't block response)
+    const activityPromises: Promise<unknown>[] = []
+    if (lead.email) {
+      activityPromises.push(
+        prisma.leadActivity.create({
+          data: { leadId: lead.id, type: 'EMAIL_SENT', payload: { to: 'seller' } },
+        }),
+      )
+    }
+    if (assignedStudent) {
+      activityPromises.push(
+        prisma.leadActivity.create({
+          data: {
+            leadId: lead.id,
+            type: 'EMAIL_SENT',
+            payload: { to: 'student', studentId: assignedStudent.id },
+          },
+        }),
+      )
+    }
+    activityPromises.push(
+      prisma.leadActivity.create({
+        data: { leadId: lead.id, type: 'EMAIL_SENT', payload: { to: 'admin' } },
+      }),
+    )
+
+    // Don't block response on emails — fire and log errors
+    Promise.allSettled([...emailPromises, ...activityPromises]).then(results => {
+      results.forEach((result, i) => {
+        if (result.status === 'rejected') {
+          console.error(`Email/activity ${i} failed:`, result.reason)
+        }
+      })
+    })
 
     return NextResponse.json({ success: true, leadId: lead.id })
   } catch (error) {
