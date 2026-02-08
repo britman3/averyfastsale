@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: avfs-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: avfs_db
+      POSTGRES_USER: avfs_user
+      POSTGRES_PASSWORD: avfs_local_pass
+    ports:
+      - '5434:5432'
+    volumes:
+      - avfs_data:/var/lib/postgresql/data
+
+volumes:
+  avfs_data:
