@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { leadFormSchema, normalisePostcode } from '@/lib/validation'
+import { routeLeadFull } from '@/lib/routing'
 
 function getClientIp(request: NextRequest): string {
   const forwarded = request.headers.get('x-forwarded-for')
@@ -90,7 +91,7 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // Create LeadActivity record
+    // Create LeadActivity record for form submission
     await prisma.leadActivity.create({
       data: {
         leadId: lead.id,
@@ -101,6 +102,32 @@ export async function POST(request: NextRequest) {
         },
       },
     })
+
+    // Route the lead
+    const assignedStudentId = await routeLeadFull(lead.postcode, lead.townCity)
+
+    if (assignedStudentId) {
+      await prisma.lead.update({
+        where: { id: lead.id },
+        data: { assignedStudentId },
+      })
+
+      await prisma.leadActivity.create({
+        data: {
+          leadId: lead.id,
+          type: 'ASSIGNED',
+          payload: { studentId: assignedStudentId, method: 'AUTO_ROUTE' },
+        },
+      })
+    } else {
+      await prisma.leadActivity.create({
+        data: {
+          leadId: lead.id,
+          type: 'ASSIGNED',
+          payload: { method: 'UNROUTED', reason: 'No matching routing rule' },
+        },
+      })
+    }
 
     return NextResponse.json({ success: true, leadId: lead.id })
   } catch (error) {

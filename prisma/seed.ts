@@ -1,7 +1,9 @@
 import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
 import bcrypt from 'bcryptjs'
 
-const prisma = new PrismaClient()
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
+const prisma = new PrismaClient({ adapter })
 
 const SYSTEM_SLUGS = [
   'admin', 'api', 'login', 'register', 'signup', 'dashboard',
@@ -56,8 +58,10 @@ async function main() {
   console.log(`✓ ${allReservedSlugs.length} reserved subdomains created`)
 
   // 3. Create sample students
-  const students = [
-    {
+  const johnSmith = await prisma.student.upsert({
+    where: { slug: 'john-smith' },
+    update: {},
+    create: {
       slug: 'john-smith',
       displayName: 'John Smith',
       phone: '07700900001',
@@ -66,7 +70,12 @@ async function main() {
       isActive: true,
       isAtCapacity: false,
     },
-    {
+  })
+
+  const sarahJones = await prisma.student.upsert({
+    where: { slug: 'sarah-jones' },
+    update: {},
+    create: {
       slug: 'sarah-jones',
       displayName: 'Sarah Jones',
       phone: '07700900002',
@@ -75,7 +84,12 @@ async function main() {
       isActive: true,
       isAtCapacity: false,
     },
-    {
+  })
+
+  const mikeWilson = await prisma.student.upsert({
+    where: { slug: 'mike-wilson' },
+    update: {},
+    create: {
       slug: 'mike-wilson',
       displayName: 'Mike Wilson',
       phone: '07700900003',
@@ -84,90 +98,134 @@ async function main() {
       isActive: true,
       isAtCapacity: true,
     },
-  ]
-
-  const createdStudents: Record<string, number> = {}
-  for (const student of students) {
-    const created = await prisma.student.upsert({
-      where: { slug: student.slug },
-      update: student,
-      create: student,
-    })
-    createdStudents[student.slug] = created.id
-  }
+  })
   console.log('✓ 3 sample students created')
 
-  // 4. Create routing rules
-  const rules = [
-    { type: 'POSTCODE_PREFIX', value: 'B1', students: [{ slug: 'john-smith', priority: 0 }] },
-    { type: 'POSTCODE_PREFIX', value: 'B', students: [{ slug: 'john-smith', priority: 0 }, { slug: 'sarah-jones', priority: 1 }] },
-    { type: 'POSTCODE_PREFIX', value: 'M', students: [{ slug: 'sarah-jones', priority: 0 }] },
-    { type: 'POSTCODE_PREFIX', value: 'LS', students: [{ slug: 'mike-wilson', priority: 0 }] },
-  ]
+  // 3b. Create student service areas
+  await prisma.studentServiceArea.createMany({
+    data: [
+      { studentId: johnSmith.id, areaType: 'POSTCODE_PREFIX', areaValue: 'West Midlands', priority: 0 },
+      { studentId: johnSmith.id, areaType: 'TOWN', areaValue: 'Birmingham', priority: 1 },
+      { studentId: johnSmith.id, areaType: 'TOWN', areaValue: 'Wolverhampton', priority: 2 },
+      { studentId: sarahJones.id, areaType: 'POSTCODE_PREFIX', areaValue: 'Greater Manchester', priority: 0 },
+      { studentId: sarahJones.id, areaType: 'TOWN', areaValue: 'Manchester', priority: 1 },
+      { studentId: sarahJones.id, areaType: 'TOWN', areaValue: 'Salford', priority: 2 },
+      { studentId: mikeWilson.id, areaType: 'POSTCODE_PREFIX', areaValue: 'West Yorkshire', priority: 0 },
+      { studentId: mikeWilson.id, areaType: 'TOWN', areaValue: 'Leeds', priority: 1 },
+    ],
+    skipDuplicates: true,
+  })
+  console.log('✓ Student service areas created')
 
-  for (const rule of rules) {
-    const routingRule = await prisma.routingRule.upsert({
-      where: { type_value: { type: rule.type, value: rule.value } },
-      update: {},
-      create: { type: rule.type, value: rule.value },
-    })
+  // 4. Create routing rules with targets
+  // Rule: B1 exact outward → john-smith (priority 0)
+  const ruleB1 = await prisma.routingRule.create({
+    data: {
+      ruleType: 'POSTCODE_PREFIX',
+      matchValue: 'B1',
+      strategy: 'PRIORITY',
+      isActive: true,
+      targets: {
+        create: [
+          { studentId: johnSmith.id, priority: 0, isActive: true },
+        ],
+      },
+    },
+  })
 
-    for (const student of rule.students) {
-      const studentId = createdStudents[student.slug]
-      if (studentId) {
-        await prisma.routingRuleStudent.upsert({
-          where: { routingRuleId_studentId: { routingRuleId: routingRule.id, studentId } },
-          update: { priority: student.priority },
-          create: { routingRuleId: routingRule.id, studentId, priority: student.priority },
-        })
-      }
-    }
-  }
+  // Rule: B district → john-smith (priority 0), sarah-jones (priority 1)
+  const ruleB = await prisma.routingRule.create({
+    data: {
+      ruleType: 'POSTCODE_PREFIX',
+      matchValue: 'B',
+      strategy: 'PRIORITY',
+      isActive: true,
+      targets: {
+        create: [
+          { studentId: johnSmith.id, priority: 0, isActive: true },
+          { studentId: sarahJones.id, priority: 1, isActive: true },
+        ],
+      },
+    },
+  })
+
+  // Rule: M district → sarah-jones (priority 0)
+  const ruleM = await prisma.routingRule.create({
+    data: {
+      ruleType: 'POSTCODE_PREFIX',
+      matchValue: 'M',
+      strategy: 'PRIORITY',
+      isActive: true,
+      targets: {
+        create: [
+          { studentId: sarahJones.id, priority: 0, isActive: true },
+        ],
+      },
+    },
+  })
+
+  // Rule: LS district → mike-wilson (priority 0) — but mike is at capacity
+  const ruleLS = await prisma.routingRule.create({
+    data: {
+      ruleType: 'POSTCODE_PREFIX',
+      matchValue: 'LS',
+      strategy: 'PRIORITY',
+      isActive: true,
+      targets: {
+        create: [
+          { studentId: mikeWilson.id, priority: 0, isActive: true },
+        ],
+      },
+    },
+  })
   console.log('✓ Routing rules created')
 
   // 5. Create homepage CMS page
-  await prisma.cmsPage.upsert({
-    where: { slug: 'home' },
+  const homePage = await prisma.page.upsert({
+    where: { scope_slug: { scope: 'MAIN', slug: 'home' } },
     update: {},
     create: {
+      scope: 'MAIN',
       slug: 'home',
       title: 'Home',
       isPublished: true,
-      sections: JSON.parse(JSON.stringify([
-        {
-          id: 'hero',
-          type: 'hero',
-          content: {
-            heading: 'Sell Your House Fast',
-            subheading: 'Get a cash offer in 24 hours. No fees, no chains, no hassle.',
-            ctaText: 'Get Your Free Offer',
+      sections: {
+        create: [
+          {
+            sectionType: 'HERO',
+            sortOrder: 0,
+            content: {
+              heading: 'Sell Your House Fast',
+              subheading: 'Get a cash offer in 24 hours. No fees, no chains, no hassle.',
+              ctaText: 'Get Your Free Offer',
+            },
           },
-        },
-        {
-          id: 'how-it-works',
-          type: 'steps',
-          content: {
-            heading: 'How It Works',
-            steps: [
-              { title: 'Tell Us About Your Property', description: 'Fill in our quick form with your property details.' },
-              { title: 'Get Your Free Offer', description: 'We\'ll provide a no-obligation cash offer within 24 hours.' },
-              { title: 'Complete In Days', description: 'Choose your completion date. We can complete in as little as 7 days.' },
-            ],
+          {
+            sectionType: 'HOW_IT_WORKS',
+            sortOrder: 1,
+            content: {
+              heading: 'How It Works',
+              steps: [
+                { title: 'Tell Us About Your Property', description: 'Fill in our quick form with your property details.' },
+                { title: 'Get Your Free Offer', description: 'We\'ll provide a no-obligation cash offer within 24 hours.' },
+                { title: 'Complete In Days', description: 'Choose your completion date. We can complete in as little as 7 days.' },
+              ],
+            },
           },
-        },
-        {
-          id: 'benefits',
-          type: 'features',
-          content: {
-            heading: 'Why Choose Us',
-            features: [
-              { title: 'No Fees', description: 'We cover all costs including legal fees.' },
-              { title: 'Fast Completion', description: 'Complete in as little as 7 days.' },
-              { title: 'Cash Buyer', description: 'No chains, no mortgage delays.' },
-            ],
+          {
+            sectionType: 'CONTENT',
+            sortOrder: 2,
+            content: {
+              heading: 'Why Choose Us',
+              features: [
+                { title: 'No Fees', description: 'We cover all costs including legal fees.' },
+                { title: 'Fast Completion', description: 'Complete in as little as 7 days.' },
+                { title: 'Cash Buyer', description: 'No chains, no mortgage delays.' },
+              ],
+            },
           },
-        },
-      ])),
+        ],
+      },
     },
   })
   console.log('✓ Homepage CMS page created')
