@@ -1,46 +1,39 @@
-import { InputHTMLAttributes } from 'react'
+import { InputHTMLAttributes, forwardRef } from 'react'
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string
   error?: string
-  helperText?: string
 }
 
-export default function Input({
-  label,
-  error,
-  helperText,
-  id,
-  className = '',
-  ...props
-}: InputProps) {
-  const inputId = id || label?.toLowerCase().replace(/\s+/g, '-')
+const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ label, error, className = '', id, ...props }, ref) => {
+    const inputId = id || props.name
+    return (
+      <div className="w-full">
+        {label && (
+          <label
+            htmlFor={inputId}
+            className="mb-1.5 block font-heading text-xs font-semibold uppercase tracking-wide text-navy"
+          >
+            {label}
+          </label>
+        )}
+        <input
+          ref={ref}
+          id={inputId}
+          className={`h-12 w-full rounded-[10px] border-[1.5px] px-4 text-base transition-colors
+            ${error ? 'border-error' : 'border-border-grey'}
+            focus:border-green focus:outline-none focus:ring-1 focus:ring-green
+            ${className}`}
+          {...props}
+        />
+        {error && (
+          <p className="mt-1 text-sm text-error">{error}</p>
+        )}
+      </div>
+    )
+  }
+)
+Input.displayName = 'Input'
 
-  return (
-    <div className="w-full">
-      {label && (
-        <label
-          htmlFor={inputId}
-          className="block text-sm font-medium text-ink mb-1"
-        >
-          {label}
-        </label>
-      )}
-      <input
-        id={inputId}
-        className={`
-          w-full h-12 px-4 rounded-[10px]
-          border transition-colors
-          ${error ? 'border-error focus:border-error focus:ring-error' : 'border-border-grey focus:border-green focus:ring-green'}
-          focus:outline-none focus:ring-1
-          ${className}
-        `}
-        {...props}
-      />
-      {error && <p className="mt-1 text-sm text-error">{error}</p>}
-      {helperText && !error && (
-        <p className="mt-1 text-sm text-gray-500">{helperText}</p>
-      )}
-    </div>
-  )
-}
+export default Input

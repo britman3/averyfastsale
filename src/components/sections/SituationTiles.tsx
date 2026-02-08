@@ -2,37 +2,37 @@ import Link from "next/link";
 
 const situations = [
   {
-    emoji: "📜",
+    emoji: "\u{1F4DC}",
     title: "Probate / Inherited",
     description: "Sell an inherited property quickly without the stress.",
     href: "/situations/probate",
   },
   {
-    emoji: "💔",
+    emoji: "\u{1F494}",
     title: "Divorce / Separation",
     description: "Move forward with a fast, clean property sale.",
     href: "/situations/divorce",
   },
   {
-    emoji: "🏦",
+    emoji: "\u{1F3E6}",
     title: "Mortgage Arrears",
     description: "Avoid repossession with a quick cash sale.",
     href: "/situations/arrears",
   },
   {
-    emoji: "🔑",
+    emoji: "\u{1F511}",
     title: "Tenant Problems",
     description: "Sell your rental property with tenants in situ.",
     href: "/situations/tenants",
   },
   {
-    emoji: "✈️",
+    emoji: "\u2708\uFE0F",
     title: "Relocating",
     description: "Need to move fast? Sell your home on your timeline.",
     href: "/situations/relocating",
   },
   {
-    emoji: "🏡",
+    emoji: "\u{1F3E1}",
     title: "Downsizing",
     description: "Downsize without the hassle of the open market.",
     href: "/situations/downsizing",

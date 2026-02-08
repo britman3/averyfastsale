@@ -1,4 +1,5 @@
-import LeadFormCard from "./LeadFormCard";
+import { Suspense } from 'react'
+import LeadForm from './LeadForm'
 
 export default function Hero() {
   return (
@@ -39,7 +40,9 @@ export default function Hero() {
 
         {/* Right column: form card */}
         <div className="w-full max-w-md flex-shrink-0">
-          <LeadFormCard />
+          <Suspense fallback={<div className="h-80 animate-pulse rounded-[20px] bg-light-grey" />}>
+            <LeadForm compact />
+          </Suspense>
         </div>
       </div>
     </section>

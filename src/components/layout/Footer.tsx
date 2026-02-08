@@ -56,7 +56,7 @@ export default function Footer() {
 
         <div className="mt-8 border-t border-white/10 pt-6 text-center">
           <p className="font-heading text-sm text-white/50">
-            &copy; 2026 A Very Fast Sale. All rights reserved.
+            &copy; {new Date().getFullYear()} A Very Fast Sale. All rights reserved.
           </p>
         </div>
       </div>

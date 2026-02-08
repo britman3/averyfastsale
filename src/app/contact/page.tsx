@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import HeroBanner from "@/components/sections/HeroBanner";
 import LeadForm from "@/components/sections/LeadForm";
@@ -49,7 +50,9 @@ export default function ContactPage() {
             </div>
 
             {/* Lead form */}
-            <LeadForm />
+            <Suspense fallback={<div className="h-96 animate-pulse rounded-xl bg-light-grey" />}>
+              <LeadForm />
+            </Suspense>
           </div>
         </div>
       </section>

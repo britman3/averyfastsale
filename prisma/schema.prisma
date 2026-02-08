@@ -4,130 +4,340 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
-model Settings {
-  id                 Int      @id @default(autoincrement())
-  adminPasswordHash  String
-  notifyAdminEmail   String
-  resendApiKey       String?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+// ============================================================
+// CORE TABLES
+// ============================================================
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  role         UserRole  @default(ADMIN)
+  studentId    String?   @unique
+  student      Student?  @relation(fields: [studentId], references: [id])
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+enum UserRole {
+  ADMIN
+  STUDENT
+}
+
+model Student {
+  id                  String               @id @default(cuid())
+  slug                String               @unique
+  displayName         String
+  phone               String
+  email               String
+  whatsappNumber      String?
+  headshotUrl         String?
+  bio                 String?              @db.Text
+  isActive            Boolean              @default(true)
+  isAtCapacity        Boolean              @default(false)
+  capacityLimitPerDay Int?
+  serviceAreas        StudentServiceArea[]
+  leads               Lead[]
+  routingRuleTargets  RoutingRuleTarget[]
+  user                User?
+  auditLogs           AuditLog[]           @relation("AuditActor")
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+}
+
+model StudentServiceArea {
+  id        String   @id @default(cuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  areaType  AreaType
+  areaValue String
+  priority  Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+enum AreaType {
+  POSTCODE_PREFIX
+  TOWN
+  COUNTY
 }
 
 model ReservedSubdomain {
-  id        Int      @id @default(autoincrement())
-  slug      String   @unique
+  slug      String   @id
   reason    String?
   createdAt DateTime @default(now())
 }
 
-model Student {
-  id            Int       @id @default(autoincrement())
-  slug          String    @unique
-  displayName   String
-  phone         String
-  email         String
-  bio           String?
-  headshotUrl   String?
-  isActive      Boolean   @default(true)
-  isAtCapacity  Boolean   @default(false)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  routingRuleStudents RoutingRuleStudent[]
-  leads               Lead[]
+model Location {
+  id             String       @id @default(cuid())
+  slug           String       @unique
+  displayName    String
+  locationType   LocationType
+  seoTitle       String?
+  seoDescription String?      @db.Text
+  heroHeading    String?
+  heroSubheading String?      @db.Text
+  contentBlocks  Json?
+  isPublished    Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 }
 
-model RoutingRule {
-  id        Int      @id @default(autoincrement())
-  type      String   // POSTCODE_PREFIX, POSTCODE_AREA, REGION, CATCH_ALL
-  value     String   // e.g. "B1", "B", "West Midlands", "*"
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  students RoutingRuleStudent[]
-
-  @@unique([type, value])
+enum LocationType {
+  CITY
+  TOWN
+  COUNTY
+  REGION
 }
 
-model RoutingRuleStudent {
-  id            Int      @id @default(autoincrement())
-  routingRuleId Int
-  studentId     Int
-  priority      Int      @default(0)
-  createdAt     DateTime @default(now())
-
-  routingRule RoutingRule @relation(fields: [routingRuleId], references: [id], onDelete: Cascade)
-  student     Student     @relation(fields: [studentId], references: [id], onDelete: Cascade)
-
-  @@unique([routingRuleId, studentId])
-}
+// ── LEADS ──
 
 model Lead {
-  id              Int      @id @default(autoincrement())
-  studentId       Int?
-  name            String
-  email           String
-  phone           String
-  postcode        String
-  propertyType    String?
-  timeframe       String?
-  message         String?
-  source          String?  // e.g. "student-site", "main-site"
-  status          String   @default("new") // new, contacted, converted, lost
-  notifiedAt      DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  student Student? @relation(fields: [studentId], references: [id], onDelete: SetNull)
+  id                   String       @id @default(cuid())
+  captureMode          CaptureMode
+  assignedStudentId    String?
+  assignedStudent      Student?     @relation(fields: [assignedStudentId], references: [id])
+  sourceSubdomainSlug  String?
+  status               LeadStatus   @default(NEW)
+  fullName             String
+  phone                String
+  email                String?
+  addressLine1         String
+  addressLine2         String?
+  townCity             String
+  postcode             String
+  approxValue          String
+  reasonForSale        String?
+  timeline             String?
+  propertyType         String?
+  tenure               String?
+  condition            String?
+  isTenanted           Boolean?
+  hasMortgageOrArrears Boolean?
+  consentMarketing     Boolean      @default(false)
+  consentTimestamp      DateTime
+  consentIp            String
+  utmSource            String?
+  utmMedium            String?
+  utmCampaign          String?
+  utmTerm              String?
+  utmContent           String?
+  referrerUrl          String?
+  notes                LeadNote[]
+  activities           LeadActivity[]
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
 }
 
-model CmsPage {
-  id        Int      @id @default(autoincrement())
-  slug      String   @unique
-  title     String
-  sections  Json     @default("[]")
-  isPublished Boolean @default(true)
+enum CaptureMode {
+  CENTRAL
+  STUDENT_DIRECT
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  OFFER_MADE
+  WON
+  LOST
+  INVALID
+}
+
+model LeadNote {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  authorId  String?
+  note      String   @db.Text
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
-// Phase 2 expansion tables
+model LeadActivity {
+  id        String           @id @default(cuid())
+  leadId    String
+  lead      Lead             @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type      LeadActivityType
+  payload   Json?
+  createdAt DateTime         @default(now())
+}
+
+enum LeadActivityType {
+  FORM_SUBMITTED
+  EMAIL_SENT
+  STATUS_CHANGED
+  ASSIGNED
+  REASSIGNED
+  NOTE_ADDED
+  EXPORTED
+}
+
+// ── ROUTING ──
+
+model RoutingRule {
+  id              String                  @id @default(cuid())
+  ruleType        AreaType
+  matchValue      String
+  strategy        RoutingStrategy         @default(PRIORITY)
+  isActive        Boolean                 @default(true)
+  targets         RoutingRuleTarget[]
+  roundRobinState RoutingRoundRobinState?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+}
+
+enum RoutingStrategy {
+  PRIORITY
+  ROUND_ROBIN
+}
+
+model RoutingRuleTarget {
+  id            String      @id @default(cuid())
+  routingRuleId String
+  routingRule   RoutingRule @relation(fields: [routingRuleId], references: [id], onDelete: Cascade)
+  studentId     String
+  student       Student     @relation(fields: [studentId], references: [id])
+  weight        Int         @default(1)
+  priority      Int         @default(0)
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+}
+
+model RoutingRoundRobinState {
+  id                String      @id @default(cuid())
+  routingRuleId     String      @unique
+  routingRule       RoutingRule @relation(fields: [routingRuleId], references: [id], onDelete: Cascade)
+  lastAssignedIndex Int         @default(0)
+  updatedAt         DateTime    @updatedAt
+}
+
+// ── CMS-LITE ──
+
+model Page {
+  id             String        @id @default(cuid())
+  scope          PageScope
+  slug           String
+  title          String
+  seoTitle       String?
+  seoDescription String?       @db.Text
+  isPublished    Boolean       @default(true)
+  sections       PageSection[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@unique([scope, slug])
+}
+
+enum PageScope {
+  MAIN
+  STUDENT_TEMPLATE
+  LOCATION
+}
+
+model PageSection {
+  id          String      @id @default(cuid())
+  pageId      String
+  page        Page        @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  sectionType SectionType
+  sortOrder   Int         @default(0)
+  content     Json
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum SectionType {
+  HERO
+  TRUST_BAR
+  FORM
+  HOW_IT_WORKS
+  SITUATION_TILES
+  FAQ
+  TESTIMONIALS
+  CTA
+  CONTENT
+  ABOUT
+  OPTIONS
+}
+
+// ── SAFETY & GOVERNANCE ──
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      Student? @relation("AuditActor", fields: [actorId], references: [id])
+  actorEmail String?
+  action     String
+  entityType String
+  entityId   String?
+  before     Json?
+  after      Json?
+  createdAt  DateTime @default(now())
+}
+
+// ── APP SETTINGS ──
+
+model Settings {
+  id                Int      @id @default(1)
+  adminPasswordHash String
+  fallbackStudentId String?
+  notifyAdminEmail  String?
+  resendApiKey      String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// ============================================================
+// EXPANSION TABLES — Phase 2 (created now, no UI)
+// ============================================================
 
 model AnalyticsEvent {
-  id        Int      @id @default(autoincrement())
-  sessionId String
-  event     String
-  page      String?
-  meta      Json?
-  createdAt DateTime @default(now())
+  id            String    @id @default(cuid())
+  eventType     EventType
+  sessionId     String?
+  userAgentHash String?
+  ipHash        String?
+  subdomainSlug String?
+  pageSlug      String?
+  leadId        String?
+  studentId     String?
+  utmSource     String?
+  utmMedium     String?
+  utmCampaign   String?
+  utmTerm       String?
+  utmContent    String?
+  metadata      Json?
+  createdAt     DateTime  @default(now())
+}
 
-  analyticsSession AnalyticsSession? @relation(fields: [sessionId], references: [sessionId])
+enum EventType {
+  PAGE_VIEW
+  FORM_START
+  FORM_STEP_COMPLETE
+  FORM_SUBMIT
+  CLICK_CALL
+  CLICK_WHATSAPP
+  CLICK_EMAIL
 }
 
 model AnalyticsSession {
-  id         Int      @id @default(autoincrement())
-  sessionId  String   @unique
-  source     String?
-  medium     String?
-  campaign   String?
-  referrer   String?
-  userAgent  String?
-  ip         String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  events AnalyticsEvent[]
+  id          String   @id @default(cuid())
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  referrerUrl String?
 }
 
 model FormStep {
-  id         Int      @id @default(autoincrement())
-  sessionId  String
-  step       Int
-  fieldName  String
-  fieldValue String?
-  completedAt DateTime?
+  id         String   @id @default(cuid())
+  stepNumber Int
+  title      String
+  fields     Json
+  isActive   Boolean  @default(true)
+  sortOrder  Int      @default(0)
   createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

@@ -1,20 +1,18 @@
-import { ReactNode } from 'react'
+import { HTMLAttributes } from 'react'
 
-interface CardProps {
-  children: ReactNode
-  className?: string
+interface CardProps extends HTMLAttributes<HTMLDivElement> {
+  variant?: 'default' | 'form'
 }
 
-export default function Card({ children, className = '' }: CardProps) {
+export default function Card({ variant = 'default', children, className = '', ...props }: CardProps) {
+  const base = 'rounded-2xl border'
+  const variants = {
+    default: 'bg-white border-border-grey shadow-[0_2px_12px_rgba(0,0,0,0.04)] p-6',
+    form: 'bg-light-grey border-border-grey p-9 rounded-[20px]',
+  }
+
   return (
-    <div
-      className={`
-        bg-white rounded-2xl shadow-sm
-        border border-border-grey
-        p-6
-        ${className}
-      `}
-    >
+    <div className={`${base} ${variants[variant]} ${className}`} {...props}>
       {children}
     </div>
   )
