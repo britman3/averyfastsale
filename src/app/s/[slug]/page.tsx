@@ -15,7 +15,7 @@ export async function generateMetadata({
   const { student } = resolution
   const primaryArea =
     student.serviceAreas.length > 0
-      ? student.serviceAreas.sort((a, b) => a.priority - b.priority)[0].areaValue
+      ? student.serviceAreas.sort((a, b) => a.priority - b.priority).at(0)?.areaValue ?? 'Your Area'
       : 'Your Area'
 
   const domain = process.env.NEXT_PUBLIC_DOMAIN || 'averyfastsale.com'
@@ -41,7 +41,7 @@ export default async function StudentHomepage({
   const { student } = resolution
   const primaryArea =
     student.serviceAreas.length > 0
-      ? student.serviceAreas.sort((a, b) => a.priority - b.priority)[0].areaValue
+      ? student.serviceAreas.sort((a, b) => a.priority - b.priority).at(0)?.areaValue ?? 'Your Area'
       : 'Your Area'
 
   const studentData = {

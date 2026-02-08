@@ -26,7 +26,7 @@ export async function middleware(request: NextRequest) {
   let subdomain: string | null = null
 
   if (host.includes(domain) && host !== domain && !host.startsWith('www.')) {
-    subdomain = host.replace(`.${domain}`, '').split(':')[0]
+    subdomain = host.replace(`.${domain}`, '').split(':')[0] ?? null
   }
 
   // For local development, support ?subdomain=john-smith query param
@@ -83,7 +83,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Match all paths except static files
+    // Match all paths except static files (broad matcher needed for subdomain routing)
     '/((?!_next/static|_next/image|favicon.ico|uploads|robots.txt).*)',
   ],
 }

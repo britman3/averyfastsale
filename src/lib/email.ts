@@ -1,6 +1,12 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+let _resend: Resend | null = null
+function getResend(): Resend {
+  if (!_resend) {
+    _resend = new Resend(process.env.RESEND_API_KEY)
+  }
+  return _resend
+}
 
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'leads@averyfastsale.com'
 const ADMIN_EMAIL = process.env.ADMIN_NOTIFY_EMAIL || 'admin@averyfastsale.com'
@@ -84,7 +90,7 @@ export async function sendSellerConfirmation(lead: {
       </p>
     `)
 
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: FROM_EMAIL,
       to: lead.email,
       subject: "We've received your property details",
@@ -184,7 +190,7 @@ export async function sendStudentLeadAlert(
 
     const subject = `🏠 New lead: ${lead.postcode} — ${lead.reasonForSale || 'Property enquiry'}`
 
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: FROM_EMAIL,
       to: studentEmail,
       subject,
@@ -239,7 +245,7 @@ export async function sendAdminLeadAlert(
 
     const subject = `New lead: ${lead.postcode} → ${studentName || 'Unassigned'}`
 
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: FROM_EMAIL,
       to: ADMIN_EMAIL,
       subject,
@@ -289,7 +295,7 @@ export async function sendUnroutedLeadAlert(
       </p>
     `)
 
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: FROM_EMAIL,
       to: ADMIN_EMAIL,
       subject: `⚠️ Unrouted lead: ${lead.postcode} — manual assignment needed`,
